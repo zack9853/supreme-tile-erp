@@ -1,17 +1,9 @@
-/**
- * Navigation component for Supreme Tile ERP
- */
-'use client'
+'use client';
 
 import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { twMerge } from 'tailwind-merge'
-import { clsx } from 'clsx'
-
-const cn = (...inputs: any[]) => {
-  return twMerge(clsx(inputs))
-}
+import { cn } from '@/lib/utils'
 
 const navigation = [
   {
@@ -75,4 +67,4 @@ export function Navigation({ userRole = 'SALES' }: NavigationProps) {
       ))}
     </nav>
   )
-} 
+}
