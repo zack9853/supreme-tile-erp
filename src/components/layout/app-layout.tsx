@@ -5,10 +5,9 @@ import { Navigation } from './navigation';
 
 interface AppLayoutProps {
   children: React.ReactNode;
-  userRole?: string;
 }
 
-export function AppLayout({ children, userRole = 'SALES' }: AppLayoutProps) {
+export function AppLayout({ children }: AppLayoutProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow">
@@ -17,11 +16,8 @@ export function AppLayout({ children, userRole = 'SALES' }: AppLayoutProps) {
             <div className="flex items-center">
               <h1 className="text-2xl font-bold text-gray-900">Supreme Tile ERP</h1>
             </div>
-            <div className="flex items-center space-x-4">
-              {/* Add user menu here */}
-            </div>
           </div>
-          <Navigation userRole={userRole} />
+          <Navigation />
         </div>
       </header>
 
