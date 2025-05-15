@@ -1,7 +1,12 @@
 import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { cn } from '@/lib/utils'
+import { twMerge } from 'tailwind-merge'
+import { clsx } from 'clsx'
+
+const cn = (...inputs: any[]) => {
+  return twMerge(clsx(inputs))
+}
 
 const navigation = [
   {
