@@ -1,3 +1,6 @@
+/**
+ * Navigation component for Supreme Tile ERP
+ */
 'use client'
 
 import React from 'react'
