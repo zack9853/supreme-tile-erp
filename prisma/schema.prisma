@@ -1,0 +1,215 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  role          UserRole  @default(SALES)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  leads         Lead[]
+  quotes        Quote[]
+  salesOrders   SalesOrder[]
+}
+
+enum UserRole {
+  ADMIN
+  SALES
+  ORDER_MANAGEMENT
+}
+
+model Lead {
+  id            String    @id @default(cuid())
+  name          String
+  email         String?
+  phone         String?
+  jobsiteAddress String?
+  notes         String?
+  status        LeadStatus @default(NEW)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  createdBy     User      @relation(fields: [userId], references: [id])
+  userId        String
+  quotes        Quote[]
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUOTED
+  CONVERTED
+  LOST
+}
+
+model Quote {
+  id            String    @id @default(cuid())
+  number        String    @unique
+  lead          Lead      @relation(fields: [leadId], references: [id])
+  leadId        String
+  status        QuoteStatus @default(DRAFT)
+  items         QuoteItem[]
+  subtotal      Float
+  tax           Float
+  total         Float
+  notes         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  createdBy     User      @relation(fields: [userId], references: [id])
+  userId        String
+  salesOrder    SalesOrder?
+}
+
+enum QuoteStatus {
+  DRAFT
+  SENT
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+model QuoteItem {
+  id            String    @id @default(cuid())
+  quote         Quote     @relation(fields: [quoteId], references: [id])
+  quoteId       String
+  product       Product   @relation(fields: [productId], references: [id])
+  productId     String
+  quantity      Float
+  unitPrice     Float
+  discount      Float     @default(0)
+  total         Float
+  notes         String?
+}
+
+model Product {
+  id            String    @id @default(cuid())
+  name          String
+  series        String?
+  color         String?
+  size          String?
+  finish        String?
+  category      ProductCategory
+  vendorId      String
+  vendor        Vendor    @relation(fields: [vendorId], references: [id])
+  vendorSku     String?
+  uom           String    @default("SQFT")
+  packageType   String    @default("BOX")
+  coverage      Float?
+  showroom      Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  quoteItems    QuoteItem[]
+  orderItems    OrderItem[]
+}
+
+enum ProductCategory {
+  WALL
+  FLOOR
+  MOSAIC
+  TRIM
+  GROUT
+  OTHER
+}
+
+model Vendor {
+  id            String    @id @default(cuid())
+  name          String
+  email         String?
+  phone         String?
+  address       String?
+  products      Product[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model SalesOrder {
+  id            String    @id @default(cuid())
+  number        String    @unique
+  quote         Quote     @relation(fields: [quoteId], references: [id])
+  quoteId       String    @unique
+  status        OrderStatus @default(NEW)
+  items         OrderItem[]
+  subtotal      Float
+  tax           Float
+  total         Float
+  notes         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  createdBy     User      @relation(fields: [userId], references: [id])
+  userId        String
+  purchaseOrders PurchaseOrder[]
+}
+
+enum OrderStatus {
+  NEW
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  COMPLETED
+  CANCELLED
+}
+
+model OrderItem {
+  id            String    @id @default(cuid())
+  salesOrder    SalesOrder @relation(fields: [salesOrderId], references: [id])
+  salesOrderId  String
+  product       Product   @relation(fields: [productId], references: [id])
+  productId     String
+  quantity      Float
+  unitPrice     Float
+  total         Float
+  eta           DateTime?
+  notes         String?
+  purchaseOrderItem PurchaseOrderItem?
+}
+
+model PurchaseOrder {
+  id            String    @id @default(cuid())
+  number        String    @unique
+  salesOrder    SalesOrder @relation(fields: [salesOrderId], references: [id])
+  salesOrderId  String
+  status        PurchaseOrderStatus @default(DRAFT)
+  items         PurchaseOrderItem[]
+  subtotal      Float
+  tax           Float
+  total         Float
+  notes         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+enum PurchaseOrderStatus {
+  DRAFT
+  SENT
+  CONFIRMED
+  SHIPPED
+  RECEIVED
+  CANCELLED
+}
+
+model PurchaseOrderItem {
+  id            String    @id @default(cuid())
+  purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId], references: [id])
+  purchaseOrderId String
+  orderItem     OrderItem @relation(fields: [orderItemId], references: [id])
+  orderItemId   String    @unique
+  quantity      Float
+  unitPrice     Float
+  total         Float
+  notes         String?
+}
