@@ -1,11 +1,11 @@
-'use client'
+'use client';
 
-import React from 'react'
-import { Navigation } from './navigation'
+import React from 'react';
+import { Navigation } from './navigation';
 
 interface AppLayoutProps {
-  children: React.ReactNode
-  userRole?: string
+  children: React.ReactNode;
+  userRole?: string;
 }
 
 export function AppLayout({ children, userRole = 'SALES' }: AppLayoutProps) {
@@ -29,5 +29,5 @@ export function AppLayout({ children, userRole = 'SALES' }: AppLayoutProps) {
         {children}
       </main>
     </div>
-  )
-} 
+  );
+}
